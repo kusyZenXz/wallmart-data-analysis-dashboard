@@ -1,14 +1,9 @@
-# 🛒 Walmart Sales Dashboard Analysis
+Walmart Sales Intelligence Dashboard
 
-## 📊 Project Overview
-
-This project analyzes Walmart sales data to uncover key business insights and trends using Excel and an interactive HTML dashboard.
-
-The goal of this project is to simulate a real-world business scenario where data is transformed into actionable insights for decision-making.
-
+Analyzing $160M+ in weekly sales across 45 Walmart stores (2010–2013) to uncover how promotions, weather, fuel prices, and unemployment drive retail performance.
 ---
 
-## 🎯 Objectives
+##  Objectives
 
 * Analyze sales performance across different regions and categories
 * Identify trends and patterns in revenue
@@ -17,7 +12,7 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 🧰 Tools & Technologies Used
+## Tools & Technologies Used
 
 * Microsoft Excel (Data Cleaning, Pivot Tables, Analysis)
 * HTML Dashboard (for visualization)
@@ -25,7 +20,7 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 📁 Files Included
+## Files Included
 
 * `Walmart_Data.xlsx` → Raw + cleaned dataset
 * `Dashboard.html` → Interactive dashboard
@@ -33,7 +28,7 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 📈 Key Insights
+## Key Insights
 
 * Certain regions contribute significantly higher revenue
 * Seasonal trends impact sales performance
@@ -41,7 +36,7 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 💡 What I Learned
+## What I Learned
 
 * Data cleaning and preprocessing in Excel
 * Creating dashboards for business storytelling
@@ -50,7 +45,7 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 🚀 Future Improvements
+## Future Improvements
 
 * Add SQL-based data extraction
 * Build Power BI / Tableau version
@@ -58,12 +53,12 @@ The goal of this project is to simulate a real-world business scenario where dat
 
 ---
 
-## 👩‍💻 About Me
+## About Me
 
 I am currently transitioning into a Data Analyst role, building real-world projects to strengthen my skills in Excel, SQL, and data visualization.
 
 ---
 
-## ⭐ If you found this useful
+## If you found this useful
 
 Give this repo a star and feel free to connect!
