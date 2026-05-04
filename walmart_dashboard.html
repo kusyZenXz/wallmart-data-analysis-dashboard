@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walmart Sales Intelligence Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e17;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: rgba(255,255,255,0.07);
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --accent3: #f59e0b;
+  --accent4: #10b981;
+  --red: #ef4444;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 56px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 20%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 100px;
+  padding: 4px 14px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin-bottom: 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+.hero-tag span { width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  color: var(--muted2);
+  font-size: 15px;
+  max-width: 540px;
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+.hero-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.hero-meta-item strong { color: var(--muted2); }
+.dot { width: 3px; height: 3px; background: var(--muted); border-radius: 50%; }
+
+/* KPI BAR */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.kpi-card {
+  padding: 28px 32px;
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+.kpi-card:last-child { border-right: none; }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.kpi-card:hover { background: var(--surface2); }
+.kpi-card:hover::before { opacity: 1; }
+.kpi-card:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+.kpi-card:nth-child(2)::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+.kpi-card:nth-child(3)::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
+.kpi-card:nth-child(4)::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.kpi-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.kpi-card:nth-child(1) .kpi-value { color: #60a5fa; }
+.kpi-card:nth-child(2) .kpi-value { color: #34d399; }
+.kpi-card:nth-child(3) .kpi-value { color: #fbbf24; }
+.kpi-card:nth-child(4) .kpi-value { color: #a78bfa; }
+.kpi-sub { font-size: 11px; color: var(--muted); }
+
+/* MAIN LAYOUT */
+.main { max-width: 1400px; margin: 0 auto; padding: 40px 48px 80px; }
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid-60-40 { display: grid; grid-template-columns: 60fr 40fr; gap: 20px; margin-bottom: 20px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.card-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.chart-wrap { position: relative; height: 220px; }
+.chart-wrap-sm { position: relative; height: 180px; }
+
+/* INSIGHT BOXES */
+.insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.15);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted2);
+  line-height: 1.5;
+}
+.insight-icon {
+  width: 20px; height: 20px;
+  background: rgba(59,130,246,0.15);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  margin-top: 1px;
+}
+.insight strong { color: #93c5fd; }
+.insight.amber { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.2); }
+.insight.amber .insight-icon { background: rgba(245,158,11,0.15); }
+.insight.amber strong { color: #fcd34d; }
+.insight.green { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); }
+.insight.green .insight-icon { background: rgba(16,185,129,0.15); }
+.insight.green strong { color: #6ee7b7; }
+.insight.red { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); }
+.insight.red .insight-icon { background: rgba(239,68,68,0.15); }
+.insight.red strong { color: #fca5a5; }
+
+/* STORES TABLE */
+.store-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.store-row:last-child { border-bottom: none; }
+.store-num {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.store-bar-wrap { flex: 1; }
+.store-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text); }
+.store-bar-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.store-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.store-val { font-size: 11px; color: var(--muted); white-space: nowrap; font-family: 'Syne', sans-serif; font-weight: 600; }
+
+/* EXTERNAL FACTORS */
+.factor-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.factor-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.factor-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.factor-finding {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+.factor-detail { font-size: 11px; color: var(--muted2); }
+
+/* FOOTER */
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 24px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-left { font-size: 12px; color: var(--muted); }
+.footer-left strong { color: var(--muted2); font-family: 'Syne', sans-serif; }
+.tech-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tech-tag {
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 11px;
+  color: var(--muted2);
+}
+
+/* PROMO BARS */
+.promo-row { margin-bottom: 14px; }
+.promo-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.promo-name { font-size: 12px; color: var(--text); }
+.promo-pct { font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 600; }
+.promo-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.promo-bar-fill { height: 100%; border-radius: 3px; }
+
+@media (max-width: 900px) {
+  .hero { padding: 36px 24px 32px; }
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .main { padding: 24px; }
+  .grid-2, .grid-3, .grid-60-40 { grid-template-columns: 1fr; }
+  .factor-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag"><span></span>Portfolio Project</div>
+  <h1>Walmart Sales<br><span>Intelligence Report</span></h1>
+  <p class="hero-sub">Analyzing $160M+ in weekly sales across 45 stores — uncovering how promotions, weather, fuel prices, and unemployment drive retail performance.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><strong>Dataset:</strong> Walmart US Stores</div>
+    <div class="dot"></div>
+    <div class="hero-meta-item"><strong>Period:</strong> 2010–2013</div>
+    <div class="dot"></div>
+    <div class="hero-meta-item"><strong>Tools:</strong> Excel · Pivot Tables · Data Analysis</div>
+    <div class="dot"></div>
+    <div class="hero-meta-item"><strong>Analyst:</strong> Kusum</div>
+  </div>
+</header>
+
+<!-- KPI STRIP -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Total Revenue</div>
+    <div class="kpi-value">$160.5M</div>
+    <div class="kpi-sub">Across all 45 stores · 2010–2013</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Top Store</div>
+    <div class="kpi-value">Store #13</div>
+    <div class="kpi-sub">$8.51M weekly sales</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Peak Year</div>
+    <div class="kpi-value">2011–12</div>
+    <div class="kpi-sub">$45.9M each year — plateau detected</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Holiday Uplift</div>
+    <div class="kpi-value">7.2%</div>
+    <div class="kpi-sub">$11.5M holiday vs $149M non-holiday</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- SECTION 1: Year + Holiday -->
+  <div class="section-title">01 — Sales Trend & Seasonality</div>
+  <div class="grid-60-40">
+
+    <div class="card">
+      <div class="card-title">Year-wise Weekly Sales</div>
+      <div class="card-sub">Total weekly sales by year — growth and plateau analysis</div>
+      <div class="chart-wrap">
+        <canvas id="yearChart"></canvas>
+      </div>
+      <div class="insight">
+        <div class="insight-icon">↑</div>
+        <div><strong>2010→2011 saw +8.3% growth</strong>, then flat at $45.9M in 2011–12. 2013 dip likely due to partial-year data (only half-year captured).</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Holiday vs Non-Holiday</div>
+      <div class="card-sub">Sales split across 52 weeks</div>
+      <div class="chart-wrap">
+        <canvas id="holidayChart"></canvas>
+      </div>
+      <div class="insight amber">
+        <div class="insight-icon">!</div>
+        <div><strong>92.8% of revenue comes from non-holiday weeks</strong>, but holiday weeks show higher per-week averages — suggesting peak demand during key events.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Stores -->
+  <div class="section-title">02 — Store Performance Ranking</div>
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title">Top 5 Performing Stores</div>
+      <div class="card-sub">Ranked by total weekly sales</div>
+      <div id="topStores"></div>
+      <div class="insight green">
+        <div class="insight-icon">★</div>
+        <div><strong>Store #13 dominates</strong> with $8.51M — 19.8% higher than #2. Stores 13, 20, 10 alone contribute ~24M combined — strategic resource allocation needed.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bottom 5 Underperforming Stores</div>
+      <div class="card-sub">Stores needing strategic review</div>
+      <div id="worstStores"></div>
+      <div class="insight red">
+        <div class="insight-icon">↓</div>
+        <div><strong>Store #33 generates only $288K</strong> — 97% less than Store #13. Gap between best and worst is 29x. These stores need location or format review.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Promotions -->
+  <div class="section-title">03 — Promotion Impact Analysis</div>
+  <div class="grid-60-40">
+
+    <div class="card">
+      <div class="card-title">Weekly Sales by Promotion Level</div>
+      <div class="card-sub">How markdown intensity affects revenue</div>
+      <div class="chart-wrap">
+        <canvas id="promoChart"></canvas>
+      </div>
+      <div class="insight amber">
+        <div class="insight-icon">%</div>
+        <div><strong>Counter-intuitive finding:</strong> "No Promo" weeks generate the highest sales ($81.1M). Low promotions outperform High markdowns — suggesting heavy discounting may signal weak products, not drive demand.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Promotion Share Breakdown</div>
+      <div class="card-sub">Revenue contribution by promo type</div>
+
+      <div style="margin-top:8px">
+        <div class="promo-row">
+          <div class="promo-header">
+            <span class="promo-name">No Promo</span>
+            <span class="promo-pct" style="color:#60a5fa">50.7%</span>
+          </div>
+          <div class="promo-bar-bg"><div class="promo-bar-fill" style="width:100%;background:linear-gradient(90deg,#3b82f6,#06b6d4)"></div></div>
+        </div>
+        <div class="promo-row">
+          <div class="promo-header">
+            <span class="promo-name">Low Markdown</span>
+            <span class="promo-pct" style="color:#34d399">24.4%</span>
+          </div>
+          <div class="promo-bar-bg"><div class="promo-bar-fill" style="width:48%;background:linear-gradient(90deg,#10b981,#06b6d4)"></div></div>
+        </div>
+        <div class="promo-row">
+          <div class="promo-header">
+            <span class="promo-name">Medium Markdown</span>
+            <span class="promo-pct" style="color:#fbbf24">19.9%</span>
+          </div>
+          <div class="promo-bar-bg"><div class="promo-bar-fill" style="width:39%;background:linear-gradient(90deg,#f59e0b,#f97316)"></div></div>
+        </div>
+        <div class="promo-row">
+          <div class="promo-header">
+            <span class="promo-name">High Markdown</span>
+            <span class="promo-pct" style="color:#f87171">5.0%</span>
+          </div>
+          <div class="promo-bar-bg"><div class="promo-bar-fill" style="width:10%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+        </div>
+      </div>
+
+      <div class="insight" style="margin-top:20px">
+        <div class="insight-icon">→</div>
+        <div><strong>Business recommendation:</strong> Reduce dependency on heavy markdowns. Focus on everyday-low-price strategy and seasonal non-promo selling events.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: External Factors -->
+  <div class="section-title">04 — External Factors Deep Dive</div>
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title">Temperature vs Sales</div>
+      <div class="card-sub">Weather impact on foot traffic</div>
+      <div class="chart-wrap-sm">
+        <canvas id="tempChart"></canvas>
+      </div>
+      <div class="insight green" style="margin-top:12px">
+        <div class="insight-icon">☀</div>
+        <div><strong>High temp = High sales</strong>. $137.7M (85.8%) generated in warm weather. Cold weather severely suppresses visits.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Fuel Price vs Sales</div>
+      <div class="card-sub">Consumer travel cost sensitivity</div>
+      <div class="chart-wrap-sm">
+        <canvas id="fuelChart"></canvas>
+      </div>
+      <div class="insight amber" style="margin-top:12px">
+        <div class="insight-icon">⛽</div>
+        <div><strong>Normal fuel prices = peak sales</strong> ($114.2M). Very high fuel drops sales sharply — consumers reduce discretionary trips.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Unemployment vs Sales</div>
+      <div class="card-sub">Economic health correlation</div>
+      <div class="chart-wrap-sm">
+        <canvas id="unempChart"></canvas>
+      </div>
+      <div class="insight" style="margin-top:12px">
+        <div class="insight-icon">%</div>
+        <div><strong>Moderate unemployment = highest sales</strong> ($114.5M). Very high unemployment crushes consumer spending significantly.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: Key Takeaways -->
+  <div class="section-title">05 — Strategic Insights Summary</div>
+  <div class="factor-grid">
+    <div class="factor-card">
+      <div class="factor-label">Store Strategy</div>
+      <div class="factor-finding" style="color:#60a5fa">Top 5 stores = 57% of sales</div>
+      <div class="factor-detail">Heavy concentration risk. Bottom 5 stores underperform by 29x — candidate for closure or format restructuring.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-label">Pricing Strategy</div>
+      <div class="factor-finding" style="color:#34d399">Less discounting → More revenue</div>
+      <div class="factor-detail">No-promo weeks drive $81.1M (50.7%). High markdowns are the weakest revenue category at only $7.9M.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-label">Weather Sensitivity</div>
+      <div class="factor-finding" style="color:#fbbf24">Warm weather = 85.8% of revenue</div>
+      <div class="factor-detail">Strong seasonal dependency. Cold weather drops performance dramatically — seasonal staffing and inventory strategy needed.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-label">Fuel Price Impact</div>
+      <div class="factor-finding" style="color:#a78bfa">Elastic demand response</div>
+      <div class="factor-detail">Very high fuel prices cut store visits. Opportunity for delivery/pickup services when fuel spikes above normal range.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-label">Holiday Sales</div>
+      <div class="factor-finding" style="color:#f87171">Per-week holiday avg is higher</div>
+      <div class="factor-detail">Holiday weeks are fewer but denser in spending. Q4 holiday promotions should be amplified with targeted stock builds.</div>
+    </div>
+    <div class="factor-card">
+      <div class="factor-label">Economic Sensitivity</div>
+      <div class="factor-finding" style="color:#6ee7b7">Moderate economy is the sweet spot</div>
+      <div class="factor-detail">Walmart performs best when unemployment is moderate — customers have income but are still value-conscious shoppers.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-left">
+    <strong>Walmart Sales Analysis</strong> · Analyst: Kusum · Data Analyst Portfolio Project
+  </div>
+  <div class="tech-tags">
+    <span class="tech-tag">Excel</span>
+    <span class="tech-tag">Pivot Tables</span>
+    <span class="tech-tag">Data Cleaning</span>
+    <span class="tech-tag">Business Intelligence</span>
+    <span class="tech-tag">Retail Analytics</span>
+  </div>
+</footer>
+
+<script>
+const C = Chart;
+const defaults = {
+  color: '#64748b',
+  borderColor: 'rgba(255,255,255,0.07)',
+  font: { family: "'DM Sans', sans-serif", size: 11 }
+};
+C.defaults.color = defaults.color;
+C.defaults.borderColor = defaults.borderColor;
+C.defaults.font = defaults.font;
+C.defaults.plugins.legend.display = false;
+C.defaults.plugins.tooltip.backgroundColor = '#1e293b';
+C.defaults.plugins.tooltip.borderColor = 'rgba(255,255,255,0.1)';
+C.defaults.plugins.tooltip.borderWidth = 1;
+C.defaults.plugins.tooltip.titleColor = '#f1f5f9';
+C.defaults.plugins.tooltip.bodyColor = '#94a3b8';
+C.defaults.plugins.tooltip.padding = 10;
+
+// 1. Year chart
+new C(document.getElementById('yearChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2010', '2011', '2012', '2013 (partial)'],
+    datasets: [{
+      data: [42328003.68, 45855337.32, 45855337.32, 26455002.3],
+      backgroundColor: ['rgba(59,130,246,0.7)','rgba(6,182,212,0.85)','rgba(6,182,212,0.85)','rgba(100,116,139,0.5)'],
+      borderColor: ['#3b82f6','#06b6d4','#06b6d4','#475569'],
+      borderWidth: 1, borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false }, border: { display: false } },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        border: { display: false },
+        ticks: { callback: v => '$' + (v/1e6).toFixed(0) + 'M' }
+      }
+    }
+  }
+});
+
+// 2. Holiday doughnut
+new C(document.getElementById('holidayChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Non-Holiday Weeks', 'Holiday Weeks'],
+    datasets: [{
+      data: [149004921.8, 11488758.83],
+      backgroundColor: ['rgba(59,130,246,0.8)', 'rgba(245,158,11,0.8)'],
+      borderColor: ['#1e293b','#1e293b'],
+      borderWidth: 3, hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '72%',
+    plugins: {
+      legend: {
+        display: true, position: 'bottom',
+        labels: { padding: 16, boxWidth: 10, font: { size: 11 } }
+      },
+      tooltip: { callbacks: { label: ctx => ' $' + (ctx.raw/1e6).toFixed(1) + 'M' }}
+    }
+  }
+});
+
+// 3. Top Stores
+const topData = [
+  { num: '13', name: 'Store 13', val: 8510665.8, max: 8510665.8, color: '#3b82f6' },
+  { num: '20', name: 'Store 20', val: 8375860.22, max: 8510665.8, color: '#06b6d4' },
+  { num: '10', name: 'Store 10', val: 7318736.88, max: 8510665.8, color: '#06b6d4' },
+  { num: '4',  name: 'Store 4',  val: 7047844.44, max: 8510665.8, color: '#94a3b8' },
+  { num: '2',  name: 'Store 2',  val: 6376198.92, max: 8510665.8, color: '#94a3b8' }
+];
+const worstData = [
+  { num: '38', name: 'Store 38', val: 1225293.16, max: 1225293.16, color: '#ef4444' },
+  { num: '43', name: 'Store 43', val: 1178770.32, max: 1225293.16, color: '#f87171' },
+  { num: '3',  name: 'Store 3',  val: 1174551.56, max: 1225293.16, color: '#f87171' },
+  { num: '36', name: 'Store 36', val: 390295.36,  max: 1225293.16, color: '#fca5a5' },
+  { num: '33', name: 'Store 33', val: 288757.56,  max: 1225293.16, color: '#fca5a5' }
+];
+
+function renderStores(id, data, bgColor) {
+  const el = document.getElementById(id);
+  data.forEach(s => {
+    const pct = Math.round((s.val / s.max) * 100);
+    el.innerHTML += `<div class="store-row">
+      <div class="store-num" style="background:rgba(255,255,255,0.04);color:${s.color}">${s.num}</div>
+      <div class="store-bar-wrap">
+        <div class="store-name">${s.name}</div>
+        <div class="store-bar-bg"><div class="store-bar-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      </div>
+      <div class="store-val" style="color:${s.color}">$${(s.val/1e6).toFixed(2)}M</div>
+    </div>`;
+  });
+}
+renderStores('topStores', topData, 'blue');
+renderStores('worstStores', worstData, 'red');
+
+// 4. Promo bar chart
+new C(document.getElementById('promoChart'), {
+  type: 'bar',
+  data: {
+    labels: ['High Markdown', 'Medium Markdown', 'Low Markdown', 'No Promo'],
+    datasets: [{
+      data: [7981130.94, 31941270.63, 39049184.48, 81128673.72],
+      backgroundColor: ['rgba(239,68,68,0.7)','rgba(245,158,11,0.7)','rgba(16,185,129,0.7)','rgba(59,130,246,0.85)'],
+      borderColor: ['#ef4444','#f59e0b','#10b981','#3b82f6'],
+      borderWidth: 1, borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false }, border: { display: false } },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        border: { display: false },
+        ticks: { callback: v => '$' + (v/1e6).toFixed(0) + 'M' }
+      }
+    }
+  }
+});
+
+// 5. Temperature
+new C(document.getElementById('tempChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['High Temp', 'Normal Temp', 'Low Temp'],
+    datasets: [{
+      data: [137673792.1, 22565591.67, 254296.83],
+      backgroundColor: ['rgba(245,158,11,0.85)', 'rgba(59,130,246,0.7)', 'rgba(100,116,139,0.5)'],
+      borderColor: '#111827', borderWidth: 2, hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '68%',
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { padding: 10, boxWidth: 8, font: { size: 10 } }},
+      tooltip: { callbacks: { label: ctx => ' $' + (ctx.raw/1e6).toFixed(1) + 'M' }}
+    }
+  }
+});
+
+// 6. Fuel
+new C(document.getElementById('fuelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Low', 'Normal', 'High', 'Very High'],
+    datasets: [{
+      data: [37138906.32, 114191916.9, 9162857.36, 0],
+      backgroundColor: ['rgba(59,130,246,0.7)','rgba(6,182,212,0.85)','rgba(245,158,11,0.7)','rgba(239,68,68,0.6)'],
+      borderColor: ['#3b82f6','#06b6d4','#f59e0b','#ef4444'],
+      borderWidth: 1, borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false },
+        ticks: { callback: v => '$' + (v/1e6).toFixed(0) + 'M' }
+      },
+      y: { grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+
+// 7. Unemployment
+new C(document.getElementById('unempChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Low', 'Moderate', 'High', 'Very High'],
+    datasets: [{
+      data: [24981650.33, 114504117.8, 14474199.09, 6533713.44],
+      backgroundColor: ['rgba(59,130,246,0.7)','rgba(16,185,129,0.85)','rgba(245,158,11,0.7)','rgba(239,68,68,0.6)'],
+      borderColor: ['#3b82f6','#10b981','#f59e0b','#ef4444'],
+      borderWidth: 1, borderRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false },
+        ticks: { callback: v => '$' + (v/1e6).toFixed(0) + 'M' }
+      },
+      y: { grid: { display: false }, border: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
